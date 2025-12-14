@@ -52,7 +52,17 @@ AI chatbots love to over-explain. Ask a simple question, get an essay.
 
 ## 📦 Installation
 
-### Chrome (Manual Install)
+### Chrome (Easy - Download ZIP)
+
+1. **[⬇️ Download quietai-chrome.zip](https://github.com/vijaytank/quietai/releases/latest/download/quietai-chrome.zip)**
+2. Extract the ZIP file
+3. Open `chrome://extensions`
+4. Enable **Developer mode** (top right)
+5. Click **Load unpacked**
+6. Select the extracted folder
+7. Done! Click the 🤫 icon to configure
+
+### Chrome (Manual - Clone Repo)
 
 1. Download this repository (Code → Download ZIP)
 2. Extract the ZIP file
@@ -60,7 +70,7 @@ AI chatbots love to over-explain. Ask a simple question, get an essay.
 4. Enable **Developer mode** (top right)
 5. Click **Load unpacked**
 6. Select the `browsers/chrome` folder
-7. Done! Click the 🤫 icon to configure
+7. Done!
 
 ### Edge (Coming Soon)
 

@@ -1,0 +1,36 @@
+name: Build & Release Chrome Extension
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Create Chrome ZIP
+        run: |
+          cd browsers/chrome
+          zip -r ../../quietai-chrome.zip .
+          cd ../..
+
+      - name: Upload Chrome ZIP as artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: quietai-chrome
+          path: quietai-chrome.zip
+
+      - name: Create Release
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v1
+        with:
+          files: quietai-chrome.zip
+          generate_release_notes: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
