@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <title>AI Prompt Refiner</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: "Segoe UI", -apple-system, sans-serif;
+      margin: 0;
+      padding: 14px;
+      background: linear-gradient(135deg, #0f0f1a 0%, #1a1a2e 100%);
+      color: #e0e0e0;
+      width: 360px;
+      max-height: 580px;
+      overflow-y: auto;
+    }
+
+    body::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    body::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    body::-webkit-scrollbar-thumb {
+      background: #333;
+      border-radius: 3px;
+    }
+
+    h2 {
+      font-size: 16px;
+      margin: 0 0 10px 0;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .master-toggle {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: linear-gradient(135deg, #1e3a5f 0%, #0f1f33 100%);
+      padding: 10px 12px;
+      border-radius: 10px;
+      margin-bottom: 12px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .master-toggle span {
+      font-weight: 600;
+      font-size: 13px;
+    }
+
+    .toggle-switch {
+      position: relative;
+      width: 44px;
+      height: 22px;
+    }
+
+    .toggle-switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: #333;
+      transition: 0.3s;
+      border-radius: 22px;
+    }
+
+    .slider:before {
+      position: absolute;
+      content: "";
+      height: 16px;
+      width: 16px;
+      left: 3px;
+      bottom: 3px;
+      background-color: #fff;
+      transition: 0.3s;
+      border-radius: 50%;
+    }
+
+    input:checked+.slider {
+      background: linear-gradient(135deg, #00d4aa 0%, #00a884 100%);
+    }
+
+    input:checked+.slider:before {
+      transform: translateX(22px);
+    }
+
+    .section-title {
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: #666;
+      margin: 12px 0 6px 0;
+      font-weight: 700;
+    }
+
+    .rule-group {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+
+    .rule-group label {
+      display: flex;
+      align-items: flex-start;
+      background: rgba(255, 255, 255, 0.03);
+      padding: 8px 10px;
+      border-radius: 8px;
+      transition: all 0.2s ease;
+      cursor: pointer;
+      border: 1px solid transparent;
+      font-size: 12px;
+    }
+
+    .rule-group label:hover {
+      background: rgba(255, 255, 255, 0.08);
+      border-color: rgba(0, 212, 170, 0.3);
+    }
+
+    .rule-group label.disabled {
+      opacity: 0.4;
+      pointer-events: none;
+    }
+
+    input[type="checkbox"] {
+      margin-right: 8px;
+      margin-top: 1px;
+      transform: scale(1.1);
+      accent-color: #00d4aa;
+      flex-shrink: 0;
+    }
+
+    .rule-text {
+      display: flex;
+      flex-direction: column;
+      gap: 1px;
+    }
+
+    .rule-title {
+      font-weight: 600;
+      color: #fff;
+      font-size: 12px;
+    }
+
+    .rule-desc {
+      font-size: 10px;
+      color: #777;
+    }
+
+    .button-group {
+      display: flex;
+      gap: 8px;
+      margin-top: 12px;
+    }
+
+    button {
+      flex: 1;
+      padding: 10px;
+      background: linear-gradient(135deg, #00d4aa 0%, #00a884 100%);
+      color: #000;
+      border: none;
+      border-radius: 8px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-size: 12px;
+    }
+
+    button:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(0, 212, 170, 0.3);
+    }
+
+    button#toggleSelect {
+      background: rgba(255, 255, 255, 0.1);
+      color: #fff;
+      font-weight: 500;
+    }
+
+    button#toggleSelect:hover {
+      background: rgba(255, 255, 255, 0.15);
+      box-shadow: none;
+    }
+
+    .footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: 10px;
+      padding-top: 10px;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .logging-toggle {
+      display: flex;
+      align-items: center;
+      font-size: 10px;
+      color: #555;
+      gap: 5px;
+    }
+
+    .logging-toggle input {
+      accent-color: #00d4aa;
+    }
+
+    .version {
+      font-size: 10px;
+      color: #444;
+    }
+
+    .status-bar {
+      padding: 8px 12px;
+      background: rgba(0, 212, 170, 0.15);
+      border-radius: 6px;
+      font-size: 11px;
+      text-align: center;
+      color: #00d4aa;
+      display: none;
+      margin-top: 10px;
+    }
+
+    .status-bar.success {
+      display: block;
+      animation: fadeIn 0.3s ease;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(-5px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <h2>🤫 QuietAI</h2>
+
+  <div class="master-toggle">
+    <span>Auto-Enhance Prompts</span>
+    <label class="toggle-switch">
+      <input type="checkbox" id="masterToggle" checked />
+      <span class="slider"></span>
+    </label>
+  </div>
+
+  <div class="section-title">📝 Response Length</div>
+  <div class="rule-group" id="ruleGroup">
+    <label>
+      <input type="checkbox" id="concise" />
+      <div class="rule-text">
+        <span class="rule-title">Concise (1-2 sentences)</span>
+        <span class="rule-desc">Ultra-short answers only</span>
+      </div>
+    </label>
+    <label>
+      <input type="checkbox" id="tldr" />
+      <div class="rule-text">
+        <span class="rule-title">TL;DR (1 sentence max)</span>
+        <span class="rule-desc">Absolute minimum response</span>
+      </div>
+    </label>
+    <label>
+      <input type="checkbox" id="noYapping" />
+      <div class="rule-text">
+        <span class="rule-title">No Yapping</span>
+        <span class="rule-desc">Skip intros, greetings & filler</span>
+      </div>
+    </label>
+  </div>
+
+  <div class="section-title">📋 Format</div>
+  <div class="rule-group">
+    <label>
+      <input type="checkbox" id="bulletPoints" />
+      <div class="rule-text">
+        <span class="rule-title">Bullet Points</span>
+        <span class="rule-desc">3-5 bullet list format</span>
+      </div>
+    </label>
+    <label>
+      <input type="checkbox" id="stepByStep" />
+      <div class="rule-text">
+        <span class="rule-title">Step by Step</span>
+        <span class="rule-desc">Numbered steps (max 5)</span>
+      </div>
+    </label>
+    <label>
+      <input type="checkbox" id="proscons" />
+      <div class="rule-text">
+        <span class="rule-title">Pros & Cons</span>
+        <span class="rule-desc">Compare advantages/disadvantages</span>
+      </div>
+    </label>
+    <label>
+      <input type="checkbox" id="tableFormat" />
+      <div class="rule-text">
+        <span class="rule-title">Table Format</span>
+        <span class="rule-desc">Present as markdown table</span>
+      </div>
+    </label>
+  </div>
+
+  <div class="section-title">🎓 Explanation Style</div>
+  <div class="rule-group">
+    <label>
+      <input type="checkbox" id="eli5" />
+      <div class="rule-text">
+        <span class="rule-title">ELI5 (Explain Like I'm 5)</span>
+        <span class="rule-desc">Simple language, no jargon</span>
+      </div>
+    </label>
+    <label>
+      <input type="checkbox" id="expertMode" />
+      <div class="rule-text">
+        <span class="rule-title">Expert Mode</span>
+        <span class="rule-desc">Skip basics, use technical terms</span>
+      </div>
+    </label>
+  </div>
+
+  <div class="section-title">💻 Technical</div>
+  <div class="rule-group">
+    <label>
+      <input type="checkbox" id="codeOnly" />
+      <div class="rule-text">
+        <span class="rule-title">Code Only</span>
+        <span class="rule-desc">Just code, no explanations</span>
+      </div>
+    </label>
+  </div>
+
+  <div class="section-title">🔍 Critical Thinking</div>
+  <div class="rule-group">
+    <label>
+      <input type="checkbox" id="challenge" />
+      <div class="rule-text">
+        <span class="rule-title">Challenge Me</span>
+        <span class="rule-desc">Point out flaws in my question</span>
+      </div>
+    </label>
+    <label>
+      <input type="checkbox" id="askClarify" />
+      <div class="rule-text">
+        <span class="rule-title">Ask First</span>
+        <span class="rule-desc">Clarify before answering</span>
+      </div>
+    </label>
+  </div>
+
+  <div class="section-title">✅ Accuracy</div>
+  <div class="rule-group">
+    <label>
+      <input type="checkbox" id="noGuess" />
+      <div class="rule-text">
+        <span class="rule-title">No Guessing</span>
+        <span class="rule-desc">Say "I don't know" if uncertain</span>
+      </div>
+    </label>
+    <label>
+      <input type="checkbox" id="sources" />
+      <div class="rule-text">
+        <span class="rule-title">Cite Sources</span>
+        <span class="rule-desc">Mention where info comes from</span>
+      </div>
+    </label>
+  </div>
+
+  <div class="button-group">
+    <button id="toggleSelect">Select All</button>
+    <button id="save">Save & Apply</button>
+  </div>
+
+  <div class="footer">
+    <div class="logging-toggle">
+      <input type="checkbox" id="enableLogging" />
+      <span>Debug mode</span>
+    </div>
+    <span class="version">v1.1.0</span>
+  </div>
+
+  <div class="status-bar" id="statusBar">✓ Settings saved!</div>
+
+  <script src="popup.js"></script>
+</body>
+
+</html>

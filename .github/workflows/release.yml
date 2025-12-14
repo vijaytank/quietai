@@ -1,4 +1,4 @@
-name: Build & Release Chrome Extension
+name: Build & Release Extensions
 
 on:
   push:
@@ -23,17 +23,31 @@ jobs:
           zip -r ../../quietai-chrome.zip .
           cd ../..
 
-      - name: Upload Chrome ZIP as artifact
+      - name: Create Edge ZIP
+        run: |
+          cd browsers/edge
+          zip -r ../../quietai-edge.zip .
+          cd ../..
+
+      - name: Upload Chrome ZIP
         uses: actions/upload-artifact@v4
         with:
           name: quietai-chrome
           path: quietai-chrome.zip
 
+      - name: Upload Edge ZIP
+        uses: actions/upload-artifact@v4
+        with:
+          name: quietai-edge
+          path: quietai-edge.zip
+
       - name: Create Release
         if: startsWith(github.ref, 'refs/tags/')
         uses: softprops/action-gh-release@v1
         with:
-          files: quietai-chrome.zip
+          files: |
+            quietai-chrome.zip
+            quietai-edge.zip
           generate_release_notes: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

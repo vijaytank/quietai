@@ -3,7 +3,7 @@
 > **Shush your AI.** Get shorter, better responses from ChatGPT, Gemini, Copilot & more.
 
 [![Chrome](https://img.shields.io/badge/Chrome-Extension-green?logo=googlechrome)](./browsers/chrome)
-[![Edge](https://img.shields.io/badge/Edge-Coming%20Soon-blue?logo=microsoftedge)](./browsers/edge)
+[![Edge](https://img.shields.io/badge/Edge-Extension-blue?logo=microsoftedge)](./browsers/edge)
 [![Firefox](https://img.shields.io/badge/Firefox-Coming%20Soon-orange?logo=firefox)](./browsers/firefox)
 [![License](https://img.shields.io/badge/License-MIT-yellow)](./LICENSE)
 
@@ -72,7 +72,15 @@ AI chatbots love to over-explain. Ask a simple question, get an essay.
 6. Select the `browsers/chrome` folder
 7. Done!
 
-### Edge (Coming Soon)
+### Edge (Easy - Download ZIP)
+
+1. **[⬇️ Download quietai-edge.zip](https://github.com/vijaytank/quietai/releases/latest/download/quietai-edge.zip)**
+2. Extract the ZIP file
+3. Open `edge://extensions`
+4. Enable **Developer mode** (left sidebar)
+5. Click **Load unpacked**
+6. Select the extracted folder
+7. Done! Click the 🤫 icon to configure
 
 ### Firefox (Coming Soon)
 
