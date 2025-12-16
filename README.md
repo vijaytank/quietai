@@ -127,14 +127,13 @@ AI: Machine learning is a type of AI where computers
 
 MIT License - Use it, modify it, share it.
 
----
+See [LICENSE](./LICENSE) for details.
 
-## 💖 Support
+## 🔒 Privacy
 
-If this extension saves you time, consider:
-- ⭐ Starring this repo
-- 🐛 Reporting bugs
-- 💡 Suggesting features
+QuietAI respects your privacy. We do not collect, store, or transmit any personal data. All settings are stored locally in your browser.
+
+See our [Privacy Policy](./PRIVACY.md) for full details.
 
 ---
 
