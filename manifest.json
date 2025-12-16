@@ -3,6 +3,7 @@
   "name": "AI Prompt Refiner",
   "description": "Automatically enhance your AI prompts for shorter, better responses. Works on ChatGPT, Gemini, Copilot & more.",
   "version": "1.1.0",
+  "homepage_url": "https://github.com/vijaytank/quietai",
   "permissions": ["storage"],
   "host_permissions": ["<all_urls>"],
   "background": {
