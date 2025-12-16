@@ -23,3 +23,11 @@ Desktop.ini
 # Temp
 *.tmp
 *.temp
+
+# Store assets (generated)
+quietai-edge-store.zip
+quietai-chrome-store.zip
+
+# Temp
+*.tmp
+*.temp
