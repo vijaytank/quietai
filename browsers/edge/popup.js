@@ -25,10 +25,35 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const masterToggle = document.getElementById("masterToggle");
   const toggleBtn = document.getElementById("toggleSelect");
-  const saveBtn = document.getElementById("save");
+  const closeBtn = document.getElementById("save");
   const loggingCheckbox = document.getElementById("enableLogging");
   const ruleGroups = document.querySelectorAll(".rule-group");
   const statusBar = document.getElementById("statusBar");
+
+  // Auto-save function
+  function autoSave() {
+    const rules = {};
+    ruleIds.forEach(id => {
+      const el = document.getElementById(id);
+      if (el) rules[id] = el.checked;
+    });
+
+    chrome.storage.sync.set({
+      rules,
+      logging: loggingCheckbox.checked,
+      enabled: masterToggle.checked
+    }, () => {
+      showSavedIndicator();
+    });
+  }
+
+  // Show saved indicator
+  function showSavedIndicator() {
+    statusBar.classList.add("success");
+    setTimeout(() => {
+      statusBar.classList.remove("success");
+    }, 1500);
+  }
 
   // Load saved state
   chrome.storage.sync.get(["rules", "logging", "enabled"], (data) => {
@@ -42,8 +67,11 @@ document.addEventListener("DOMContentLoaded", () => {
     updateRuleGroupState();
   });
 
-  // Master toggle
-  masterToggle.addEventListener("change", updateRuleGroupState);
+  // Master toggle with auto-save
+  masterToggle.addEventListener("change", () => {
+    updateRuleGroupState();
+    autoSave();
+  });
 
   function updateRuleGroupState() {
     const isEnabled = masterToggle.checked;
@@ -56,7 +84,7 @@ document.addEventListener("DOMContentLoaded", () => {
     toggleBtn.style.opacity = isEnabled ? "1" : "0.5";
   }
 
-  // Toggle All
+  // Toggle All with auto-save
   toggleBtn.addEventListener("click", () => {
     const allChecked = ruleIds.every(id => document.getElementById(id)?.checked);
     ruleIds.forEach(id => {
@@ -64,6 +92,7 @@ document.addEventListener("DOMContentLoaded", () => {
       if (el) el.checked = !allChecked;
     });
     updateToggleLabel();
+    autoSave();
   });
 
   function updateToggleLabel() {
@@ -71,27 +100,22 @@ document.addEventListener("DOMContentLoaded", () => {
     toggleBtn.textContent = allChecked ? "Deselect All" : "Select All";
   }
 
-  // Save
-  saveBtn.addEventListener("click", () => {
-    const rules = {};
-    ruleIds.forEach(id => {
-      const el = document.getElementById(id);
-      if (el) rules[id] = el.checked;
-    });
-
-    chrome.storage.sync.set({
-      rules,
-      logging: loggingCheckbox.checked,
-      enabled: masterToggle.checked
-    }, () => {
-      statusBar.classList.add("success");
-      setTimeout(() => window.close(), 500);
-    });
+  // Close button (no save needed, auto-saves already)
+  closeBtn.addEventListener("click", () => {
+    window.close();
   });
 
-  // Update label on checkbox change
+  // Auto-save on checkbox change
   ruleIds.forEach(id => {
     const el = document.getElementById(id);
-    if (el) el.addEventListener("change", updateToggleLabel);
+    if (el) {
+      el.addEventListener("change", () => {
+        updateToggleLabel();
+        autoSave();
+      });
+    }
   });
+
+  // Auto-save on logging checkbox change
+  loggingCheckbox.addEventListener("change", autoSave);
 });
