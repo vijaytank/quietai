@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "QuietAI",
   "description": "Shush your AI. Get shorter, better responses from ChatGPT, Gemini, Copilot & more.",
-  "version": "1.3.0",
+  "version": "1.3.1",
   "homepage_url": "https://github.com/vijaytank/quietai",
   "permissions": [
     "storage"
