@@ -1,40 +1,31 @@
 # Sync Browsers Script
 # Run this before committing to ensure all browser folders are in sync
 
-Write-Host "🔄 Syncing files to browser folders..." -ForegroundColor Cyan
+Write-Host "Syncing files to browser folders..." -ForegroundColor Cyan
 
 $rootDir = Split-Path -Parent $PSScriptRoot
 $files = @("content.js", "popup.html", "popup.js", "background.js")
-$browsers = @("chrome", "edge")
 
-foreach ($browser in $browsers) {
-    Write-Host "`n📁 Syncing to browsers/$browser/" -ForegroundColor Yellow
-    foreach ($file in $files) {
-        $source = Join-Path $rootDir $file
-        $dest = Join-Path $rootDir "browsers\$browser\$file"
-        if (Test-Path $source) {
-            Copy-Item $source $dest -Force
-            Write-Host "  ✅ $file" -ForegroundColor Green
-        } else {
-            Write-Host "  ❌ $file not found" -ForegroundColor Red
-        }
+foreach ($file in $files) {
+    $source = Join-Path $rootDir $file
+    if (Test-Path $source) {
+        Copy-Item $source (Join-Path $rootDir "browsers\chrome\$file") -Force
+        Copy-Item $source (Join-Path $rootDir "browsers\edge\$file") -Force
+        Write-Host "  Synced: $file" -ForegroundColor Green
     }
 }
 
-# Check version consistency
-Write-Host "`n🔍 Checking version consistency..." -ForegroundColor Cyan
-$rootVersion = (Get-Content "$rootDir\manifest.json" | ConvertFrom-Json).version
-$chromeVersion = (Get-Content "$rootDir\browsers\chrome\manifest.json" | ConvertFrom-Json).version
-$edgeVersion = (Get-Content "$rootDir\browsers\edge\manifest.json" | ConvertFrom-Json).version
+# Check versions
+$rootVer = (Get-Content "$rootDir\manifest.json" | ConvertFrom-Json).version
+$chromeVer = (Get-Content "$rootDir\browsers\chrome\manifest.json" | ConvertFrom-Json).version
+$edgeVer = (Get-Content "$rootDir\browsers\edge\manifest.json" | ConvertFrom-Json).version
 
-Write-Host "  Root:   v$rootVersion" -ForegroundColor $(if ($rootVersion -eq $chromeVersion -and $rootVersion -eq $edgeVersion) { "Green" } else { "Red" })
-Write-Host "  Chrome: v$chromeVersion" -ForegroundColor $(if ($rootVersion -eq $chromeVersion) { "Green" } else { "Red" })
-Write-Host "  Edge:   v$edgeVersion" -ForegroundColor $(if ($rootVersion -eq $edgeVersion) { "Green" } else { "Red" })
-
-if ($rootVersion -eq $chromeVersion -and $rootVersion -eq $edgeVersion) {
-    Write-Host "`n✅ All versions match!" -ForegroundColor Green
-} else {
-    Write-Host "`n⚠️  Version mismatch detected! Update all manifest.json files." -ForegroundColor Yellow
+Write-Host "`nVersions: Root=$rootVer, Chrome=$chromeVer, Edge=$edgeVer"
+if ($rootVer -eq $chromeVer -and $rootVer -eq $edgeVer) {
+    Write-Host "All versions match!" -ForegroundColor Green
+}
+else {
+    Write-Host "WARNING: Version mismatch!" -ForegroundColor Yellow
 }
 
-Write-Host "`n🎉 Sync complete!" -ForegroundColor Cyan
+Write-Host "`nSync complete!" -ForegroundColor Cyan
