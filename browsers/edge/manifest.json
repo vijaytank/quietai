@@ -2,9 +2,13 @@
   "manifest_version": 3,
   "name": "QuietAI",
   "description": "Shush your AI. Get shorter, better responses from ChatGPT, Gemini, Copilot & more.",
-  "version": "1.1.1",
-  "permissions": ["storage"],
-  "host_permissions": ["<all_urls>"],
+  "version": "1.1.2",
+  "permissions": [
+    "storage"
+  ],
+  "host_permissions": [
+    "<all_urls>"
+  ],
   "background": {
     "service_worker": "background.js"
   },
@@ -24,8 +28,12 @@
   },
   "content_scripts": [
     {
-      "matches": ["<all_urls>"],
-      "js": ["content.js"],
+      "matches": [
+        "<all_urls>"
+      ],
+      "js": [
+        "content.js"
+      ],
       "run_at": "document_idle"
     }
   ]
