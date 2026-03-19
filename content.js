@@ -2,6 +2,7 @@
 // Automatically enhances prompts with proven prompt engineering techniques
 
 let isProcessing = false;
+let lastEnhancedOriginal = null;
 let cachedSettings = { rules: {}, logging: false, enabled: true };
 
 // Proven prompt instructions that AI actually follows (aggressive version)
@@ -120,12 +121,6 @@ function buildEnhancedPrompt(userPrompt) {
   const rules = cachedSettings.rules;
   const activeInstructions = [];
 
-  // Check if already enhanced
-  if (userPrompt.includes('[STYLE GUIDE]') || userPrompt.includes('IMPORTANT INSTRUCTIONS:')) {
-    if (cachedSettings.logging) console.log("⚠️ Already enhanced, skipping");
-    return userPrompt;
-  }
-
   // Collect active instructions
   Object.entries(rules).forEach(([key, isActive]) => {
     if (isActive && PROMPT_ENHANCEMENTS[key]) {
@@ -206,12 +201,29 @@ document.addEventListener("keydown", (e) => {
   const rawInput = getRawInput(el, isTextarea);
   if (!rawInput) return;
 
+  // Check if we already enhanced this exact prompt (prevents duplicate enhancements on rapid Enter presses)
+  if (rawInput === lastEnhancedOriginal) {
+    if (cachedSettings.logging) console.log("🔄 Already enhanced this prompt, sending only");
+    clickSubmitButton();
+    return;
+  }
+
+  // Check if prompt was already enhanced (has our marker)
+  if (rawInput.includes('[STYLE GUIDE]') || rawInput.includes('IMPORTANT INSTRUCTIONS:')) {
+    if (cachedSettings.logging) console.log("⚠️ Already enhanced, skipping");
+    clickSubmitButton();
+    return;
+  }
+
   // Intercept!
   e.preventDefault();
   e.stopPropagation();
   isProcessing = true;
 
   if (cachedSettings.logging) console.log("🎯 Intercepted, enhancing...");
+
+  // Store original prompt before enhancement
+  lastEnhancedOriginal = rawInput;
 
   const enhanced = buildEnhancedPrompt(rawInput);
 
@@ -226,7 +238,11 @@ document.addEventListener("keydown", (e) => {
         key: "Enter", code: "Enter", keyCode: 13, bubbles: true
       }));
     }
-    setTimeout(() => { isProcessing = false; }, 300);
+    // Extended timeout to prevent rapid re-processing
+    setTimeout(() => {
+      isProcessing = false;
+      lastEnhancedOriginal = null;
+    }, 1500);
   }, 100);
 
 }, true);
